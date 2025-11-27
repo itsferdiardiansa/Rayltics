@@ -14,7 +14,6 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "6926a9c0fffdbb567f64b2b0",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
@@ -52,11 +51,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": [
-        "apps/api/api-gateway-e2e/**/*",
-        "apps/api/auth-service-e2e/**/*",
-        "apps/api/math-service-e2e/**/*"
-      ]
+      "exclude": []
     },
     {
       "plugin": "@nx/webpack/plugin",

@@ -1,5 +1,5 @@
 {
-  "name": "database-client",
+  "name": "db-cli",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     }
   },
   "nx": {
-    "sourceRoot": "packages/infrastructure/database-client/src",
+    "sourceRoot": "packages/infrastructure/db-cli/src",
     "targets": {
       "build": {
         "executor": "@nx/js:swc",
@@ -23,9 +23,9 @@
           "{options.outputPath}"
         ],
         "options": {
-          "outputPath": "packages/infrastructure/database-client/dist",
-          "main": "packages/infrastructure/database-client/src/index.ts",
-          "tsConfig": "packages/infrastructure/database-client/tsconfig.lib.json",
+          "outputPath": "packages/infrastructure/db-cli/dist",
+          "main": "packages/infrastructure/db-cli/src/index.ts",
+          "tsConfig": "packages/infrastructure/db-cli/tsconfig.lib.json",
           "skipTypeCheck": true,
           "stripLeadingPaths": true
         }
@@ -33,6 +33,6 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "@swc/helpers": "~0.5.11"
   }
 }

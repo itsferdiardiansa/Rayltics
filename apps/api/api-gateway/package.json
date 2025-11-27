@@ -64,7 +64,8 @@
         ],
         "options": {
           "buildTarget": "api-gateway:build",
-          "runBuildTargetDependencies": false
+          "runBuildTargetDependencies": false,
+          "watch": true
         },
         "configurations": {
           "development": {

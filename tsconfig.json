@@ -22,7 +22,7 @@
       "path": "./packages/core/logger"
     },
     {
-      "path": "./packages/infrastructure/database-client"
+      "path": "./packages/infrastructure/db-cli"
     }
   ]
 }

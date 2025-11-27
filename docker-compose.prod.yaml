@@ -1,0 +1,77 @@
+services:
+  mongo:
+    image: mongo:7.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - rayltics-net
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: runner
+      args:
+        APP_NAME: api-gateway
+    ports:
+      - '${GATEWAY_PORT}:3000'
+    environment:
+      - PORT=${GATEWAY_PORT}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+      - MATH_SERVICE_URL=${MATH_SERVICE_URL}
+      - MONGO_URI=${MONGO_URI}
+    networks:
+      - rayltics-net
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: runner
+      args:
+        APP_NAME: auth-service
+    ports:
+      - '${AUTH_PORT}:3333'
+    environment:
+      - PORT=${AUTH_PORT}
+      - MONGO_URI=${AUTH_MATH_MONGO_URI}
+    networks:
+      - rayltics-net
+
+  math-service:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: runner
+      args:
+        APP_NAME: math-service
+    ports:
+      - '${MATH_PORT}:3334'
+    environment:
+      - PORT=${MATH_PORT}
+      - MONGO_URI=${MATH_MONGO_URI}
+    networks:
+      - rayltics-net
+
+  main-web-app:
+    build:
+      context: .
+      dockerfile: apps/web/main-web-app/Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    ports:
+      - '${WEB_PORT}:4200'
+    networks:
+      - rayltics-net
+
+volumes:
+  mongo_data:
+
+networks:
+  rayltics-net:
+    driver: bridge

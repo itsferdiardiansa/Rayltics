@@ -2,6 +2,11 @@
   "name": "main-web-app",
   "version": "0.0.1",
   "private": true,
+  "nx": {
+    "tags": [
+      "type:web"
+    ]
+  },
   "dependencies": {
     "next": "~16.0.1",
     "react": "^19.0.0",

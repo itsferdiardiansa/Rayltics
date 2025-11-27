@@ -13,9 +13,7 @@ module.exports = {
   },
 
   '**/*.{ts,tsx,js,jsx}': filenames => {
-    return `npx jest --passWithNoTests --findRelatedTests ${filenames
-      .map(f => `"${f}"`)
-      .join(' ')}`
+    return 'npx nx affected -t test --passWithNoTests'
   },
 
   '**/*.{ts,tsx}': () => {

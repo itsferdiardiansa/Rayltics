@@ -1,5 +1,5 @@
 {
-  "name": "shared-types",
+  "name": "@rayltics/types",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     }
   },
   "nx": {
-    "sourceRoot": "packages/core/shared-types/src",
+    "sourceRoot": "packages/core/types/src",
     "targets": {
       "build": {
         "executor": "@nx/js:swc",
@@ -23,9 +23,9 @@
           "{options.outputPath}"
         ],
         "options": {
-          "outputPath": "packages/core/shared-types/dist",
-          "main": "packages/core/shared-types/src/index.ts",
-          "tsConfig": "packages/core/shared-types/tsconfig.lib.json",
+          "outputPath": "packages/core/types/dist",
+          "main": "packages/core/types/src/index.ts",
+          "tsConfig": "packages/core/types/tsconfig.lib.json",
           "skipTypeCheck": true,
           "stripLeadingPaths": true
         }

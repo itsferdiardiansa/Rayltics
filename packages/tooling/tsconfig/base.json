@@ -1,7 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "../..",
+    "baseUrl": "../..",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -13,12 +14,11 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@rayltics/shared-types": ["packages/core/shared-types/src/index.ts"],
+      "@rayltics/types": ["packages/core/shared-types/src/index.ts"],
       "@rayltics/logger": ["packages/core/logger/src/index.ts"],
       "@rayltics/db-cli/*": ["packages/infrastructure/db-cli/src/*"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules"]
 }

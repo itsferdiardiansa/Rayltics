@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: rayltics_mongo_test
+    restart: always
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: securepassword123
+      MONGO_INITDB_DATABASE: test_db
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:alpine
+    container_name: rayltics_redis_test
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --requirepass securepassword123
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mongo_data:
+  redis_data:

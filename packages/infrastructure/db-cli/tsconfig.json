@@ -1,7 +1,25 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "@rayltics/tsconfig/base",
+  "compilerOptions": {
+    "rootDir": "src",
+    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "importHelpers": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
   "files": [],
   "include": [],
+  "exclude": ["node_modules"],
   "references": [
     {
       "path": "./tsconfig.lib.json"

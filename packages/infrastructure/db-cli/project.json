@@ -1,0 +1,20 @@
+{
+  "sourceRoot": "packages/infrastructure/db-cli/src",
+  "targets": {
+    "pre-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/infrastructure/db-cli",
+        "command": "rm -rf dist"
+      }
+    },
+    "build": {
+      "dependsOn": ["pre-build"],
+      "outputs": ["{workspaceRoot}/packages/infrastructure/db-cli/dist"],
+      "options": {
+        "cwd": "packages/infrastructure/db-cli",
+        "command": "tsc -p tsconfig.lib.json && tsc-alias -p tsconfig.lib.json"
+      }
+    }
+  }
+}

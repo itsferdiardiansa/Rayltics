@@ -1,14 +1,25 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "@rayltics/tsconfig/nest",
   "compilerOptions": {
-    "baseUrl": ".",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "src",
+    "baseUrl": ".",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "emitDeclarationOnly": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["node"]
+    "declaration": true,
+    "tsBuildInfoFile": "tsconfig.lib.tsbuildinfo",
+    "composite": false,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts"],
-  "references": []
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/__tests__/*.ts",
+    "**/playgrounds/*.ts"
+  ]
 }

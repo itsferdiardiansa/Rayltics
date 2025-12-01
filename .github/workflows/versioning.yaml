@@ -12,6 +12,6 @@ permissions:
 jobs:
   version-check:
     name: version-check
-    uses: itsferdiardiansa/ci-toolbox/.github/workflows/versioning.yaml@v1.0.0
+    uses: itsferdiardiansa/ci-toolbox/.github/workflows/versioning.yaml@v1.0.1
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}

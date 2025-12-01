@@ -2,27 +2,5 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": [
-    {
-      "path": "./apps/api/api-gateway"
-    },
-    {
-      "path": "./apps/api/auth-service"
-    },
-    {
-      "path": "./apps/api/math-service"
-    },
-    {
-      "path": "./apps/web/main-web-app"
-    },
-    {
-      "path": "./packages/core/shared-types"
-    },
-    {
-      "path": "./packages/core/logger"
-    },
-    {
-      "path": "./packages/infrastructure/database-client"
-    }
-  ]
+  "references": []
 }

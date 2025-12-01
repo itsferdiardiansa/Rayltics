@@ -1,0 +1,117 @@
+services:
+  mongo:
+    image: mongo:7.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - '${MONGO_PORT}:27017'
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - rayltics-net
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+      args:
+        APP_NAME: api-gateway
+    command: npx nodemon --legacy-watch --watch apps/api/api-gateway/src --ext ts,json --exec "npx nx build api-gateway && node apps/api/api-gateway/dist/main.js"
+    ports:
+      - '${GATEWAY_PORT}:3000'
+    environment:
+      - PORT=${GATEWAY_PORT}
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+      - MATH_SERVICE_URL=${MATH_SERVICE_URL}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - auth-service
+      - math-service
+    networks:
+      - rayltics-net
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+      args:
+        APP_PORT: ${AUTH_PORT}
+        APP_NAME: auth-service
+    command: npx nodemon --legacy-watch --watch apps/api/auth-service/src --ext ts,json --exec "npx nx build auth-service && node apps/api/auth-service/dist/main.js"
+    ports:
+      - '${AUTH_PORT}:3333'
+      - '9230:9229'
+    environment:
+      - PORT=${AUTH_PORT}
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_PATH=/node_modules
+      - MONGO_URI=${AUTH_MONGO_URI}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - rayltics-net
+
+  math-service:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+      args:
+        APP_PORT: ${MATH_PORT}
+        APP_NAME: math-service
+    command: npx nodemon --legacy-watch --watch apps/api/math-service/src --ext ts,json --exec "npx nx build math-service && node apps/api/math-service/dist/main.js"
+    ports:
+      - '${MATH_PORT}:3334'
+      - '9231:9229'
+    environment:
+      - PORT=${MATH_PORT}
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_PATH=/node_modules
+      - MONGO_URI=${MATH_MONGO_URI}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - rayltics-net
+
+  main-web-app:
+    build:
+      context: .
+      dockerfile: apps/web/main-web-app/Dockerfile
+      target: dev
+      args:
+        WEB_PORT: ${WEB_PORT}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    command: npx nx dev main-web-app -H 0.0.0.0 -p ${WEB_PORT}
+    ports:
+      - '${WEB_PORT}:4200'
+    environment:
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/web/main-web-app/.next
+    networks:
+      - rayltics-net
+
+volumes:
+  mongo_data:
+
+networks:
+  rayltics-net:
+    driver: bridge

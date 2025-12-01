@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class AppService {
-  getData(): { message: string } {
-    return { message: 'Hello API' }
+  generateToken(): { token: string | number } {
+    return { token: 'Bearers: ' + +new Date() }
   }
 }

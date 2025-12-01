@@ -1,0 +1,14 @@
+name: "CodeQL config"
+
+disable-default-queries: false
+
+paths:
+  - apps
+  - packages 
+
+paths-ignore:
+  - '**/node_modules'
+  - '**/dist'
+  - '**/test'
+  - '**/*.spec.ts'
+  - '**/*.test.ts'

@@ -1,89 +1,153 @@
-# Rayltiycs
+# @rayltics
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**@rayltics** is a high-performance, distributed e-commerce backend designed to handle + users/month. It utilizes a hybrid micro-services architecture combining gRPC for low-latency internal communication and Kafka for asynchronous event-driven consistency.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## Architecture Overview
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+The system is split into three distinct scaling clusters:
 
-## Finish your CI setup
+- **Transactors (Stateless):** CPU-bound services (Orders, Inventory) that scale horizontally.
+- **Streamers (Stateful):** RAM-bound services (Chat, Notifications) handling long-lived WebSocket connections. They bridge users via Redis Pub/Sub.
+- **Workers (Background):** Consumers that process Kafka events for eventual consistency (e.g., archiving chat logs, sending emails).
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/oZsB5iubsq)
+## Communication Patterns
 
-## Generate a library
+- **External:** REST/GraphQL (via API Gateway) & WebSockets.
+- **Internal Sync:** gRPC (Protobuf) for critical dependency calls (e.g., Gateway -> Inventory).
+- **Internal Async:** Kafka events for side effects (e.g., Order Created -> Send Email).
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## Project Structure (Nx Monorepo)
+
+```bash
+├── apps/
+│   ├── api-gateway/          # Entry point (HTTP + WS Adapter)
+│   ├── services/             # Stateless Cluster (gRPC)
+│   │   ├── auth/             # JWT & Identity
+│   │   ├── order/            # Order Processing & Sagas
+│   │   ├── inventory/        # Stock management (Redis Locking)
+│   │   └── catalog/          # Product Search (Mongo/Elastic)
+│   ├── streamers/            # Stateful Cluster (WebSockets)
+│   │   └── chat/             # Real-time Messaging
+│   └── workers/              # Background Cluster
+│       └── chat-persister/   # Saves Kafka stream to Mongo
+│
+├── packages/
+│   ├── proto/                # Shared .proto files (Contracts)
+│   ├── contracts/            # Shared DTOs & Event Definitions
+│   └── common/               # Shared Utilities (Guards, Interceptors)
+│
+├── infra/
+│   ├── docker/               # Local dev environment
+│   ├── k8s/                  # Kubernetes manifests (Helm)
+│   └── terraform/            # Cloud infrastructure (IaC)
 ```
 
-## Run tasks
+## Getting Started
 
-To build the library use:
+### Prerequisites
 
-```sh
-npx nx build pkg1
+- Node.js v18+
+- Docker & Docker Compose
+- pnpm (recommended) or npm
+
+## 1. Installation
+
+### Cloning the repo and installing dependencies:
+
+```bash
+git clone https://github.com/itsferdiardiansa/rayltics.git
+cd rayltics
+
+pnpm install
 ```
 
-To run any task with Nx use:
+## 2. Infrastructure Setup
 
-```sh
-npx nx <target> <project-name>
+### Spin up the Databases (Postgres, Mongo, Redis) and Brokers (Kafka, Zookeeper).
+
+```bash
+docker-compose -f infra/docker/docker-compose.yml up -d
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Note: The postgres container will automatically execute infra/docker/postgres-init.sql on the first run to create the 5 required databases (order_db, inventory_db, etc.).
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### 3. Running the Apps
 
-## Versioning and releasing
+You can run all services in parallel using Nx:
 
-To version and release the library use
-
-```
-npx nx release
+```bash
+npx nx run-many --target=serve --all --parallel=5
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```bash
+npx nx serve api-gateway
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
+```bash
+npx nx serve order-service
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+## Development Workflow
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Working with gRPC Protobufs
 
-## Install Nx Console
+This project uses `.proto` files as the source of truth.
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+- Edit libs/proto/src/order.proto.
+- The build system automatically copies these assets to the dist/ folder.
+- Do not manually write TypeScript interfaces for these; let the NestJS gRPC compiler handle the mapping.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Creating a New Microservice
 
-## Useful links
+Use the Nx generator to scaffold a new service:
 
-Learn more:
+```bash
+npx nx g @nx/nest:app services/payment
+```
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Add it to docker-compose manually in infra/docker/docker-compose.yml
 
-And join the Nx community:
+### Shared Libraries
 
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- DTOs: Put request/response shapes in libs/contracts.
+- Events: Put Kafka event classes in libs/contracts/src/events.
+- Utils: Put Auth Guards or Logging logic in libs/common.
+
+### Testing
+
+We use Jest for Unit and E2E testing.
+
+```bash
+npx nx run-many --target=test --all
+```
+
+```bash
+npx nx e2e order-service-e2e
+```
+
+### Deployment (Production)
+
+### Docker Build
+
+Since this is a monorepo, we build specific apps using the context of the root.
+
+```bash
+docker build -f apps/services/order/Dockerfile . -t rayltics/order-service:latest
+```
+
+### Kubernetes
+
+Helm charts are located in infra/k8s/charts.
+
+```bash
+helm install order-service ./infra/k8s/charts/nestjs-service --set image.repository=rayltics/order-service
+```
+
+### Key Design Decisions
+
+- **Why Hybrid?**
+  - REST is too slow for internal chatter. We use gRPC. But gRPC is synchronous. We use Kafka for things that can wait.
+- **Why Separate Chat?**
+  - Chat requires maintaining state (socket connections). Mixing this with stateless Order processing creates scaling bottlenecks.
+- **Why Distributed Locks?**
+  - To prevent race conditions on inventory during high-concurrency events (Flash Sales), we use Redis Mutexes in the Inventory Service.

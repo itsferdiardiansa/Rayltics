@@ -1,6 +1,3 @@
 packages:
-  - 'apps/api/*'
-  - 'apps/web/*'
-  - 'packages/tooling/*'
-  - 'packages/core/*'
-  - 'packages/infra/*'
+  - 'apps/**/*'
+  - 'packages/**/*'

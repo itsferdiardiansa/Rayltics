@@ -1,0 +1,16 @@
+{
+  "sourceRoot": "packages/core/logger/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:swc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "packages/core/logger/dist",
+        "main": "packages/core/logger/src/index.ts",
+        "tsConfig": "packages/core/logger/tsconfig.lib.json",
+        "skipTypeCheck": true,
+        "stripLeadingPaths": true
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: vault-module
+manifests:
+  rawYaml:
+    - k8s.yaml
+deploy:
+  kubectl: {}
+portForward:
+  - resourceType: service
+    resourceName: vault
+    port: 8200
+    localPort: 8200

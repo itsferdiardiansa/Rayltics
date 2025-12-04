@@ -1,0 +1,25 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: rayltics-root
+requires:
+  - path: infra/platform/base/skaffold.yaml
+  - path: infra/platform/mongo/skaffold.yaml
+  - path: infra/platform/vault/skaffold.yaml
+  - path: infra/domains/auth/skaffold.yaml
+  - path: infra/domains/gateway/skaffold.yaml
+profiles:
+  - name: auth
+    patches:
+      - op: remove
+        path: /requires/4
+  - name: dev
+    activation:
+      - command: dev
+    deploy:
+      kubectl: {}
+  - name: prod
+    activation:
+      - command: run
+    deploy:
+      kubectl: {}

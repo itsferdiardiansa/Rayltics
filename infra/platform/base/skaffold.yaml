@@ -1,0 +1,23 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: base-module
+manifests:
+  kustomize:
+    paths:
+      - .
+deploy:
+  kubectl: {}
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    manifests:
+      kustomize:
+        paths:
+          - ../overlays/dev
+  - name: prod
+    manifests:
+      kustomize:
+        paths:
+          - ../overlays/prod

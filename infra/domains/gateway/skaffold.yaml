@@ -1,0 +1,22 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: gateway-module
+build:
+  artifacts:
+    - image: rayltics/api-gateway
+      context: ../../../
+      docker:
+        dockerfile: infra/docker/gateway/Dockerfile
+        buildArgs:
+          APP_NAME: api-gateway
+manifests:
+  rawYaml:
+    - k8s.yaml
+deploy:
+  kubectl: {}
+portForward:
+  - resourceType: service
+    resourceName: api-gateway
+    port: 3000
+    localPort: 3000

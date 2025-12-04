@@ -1,0 +1,32 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: auth-module
+build:
+  artifacts:
+    - image: rayltics/auth-service
+      context: ../../../
+      docker:
+        dockerfile: infra/docker/services/Dockerfile
+        buildArgs:
+          APP_NAME: auth
+        target: runner 
+manifests:
+  rawYaml:
+    - k8s.yaml
+deploy:
+  kubectl: {}
+profiles:
+  - name: dev
+    build:
+      artifacts:
+        - image: rayltics/auth-service
+          context: ../../../
+          docker:
+            dockerfile: infra/docker/services/Dockerfile
+            buildArgs:
+              APP_NAME: auth
+            target: dev
+    manifests:
+      rawYaml:
+        - k8s.yaml
